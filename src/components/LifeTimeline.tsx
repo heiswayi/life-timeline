@@ -309,6 +309,26 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
       });
     }
   };
+
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!timelineRef.current) return;
+    
+    const startX = event.clientX;
+    const startScrollLeft = timelineRef.current.scrollLeft;
+  
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      timelineRef.current!.scrollLeft = startScrollLeft - deltaX;
+    };
+  
+    const handleMouseUp = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+  };
   
   return (
     <div className={cn("flex flex-col h-full", className)}>
@@ -324,6 +344,7 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
         ref={timelineRef}
         className="overflow-x-auto overscroll-x-contain timeline-scrollbar bg-gradient-to-b from-background/40 to-background"
         style={{ touchAction: 'pan-x' }}
+        onMouseDown={handleMouseDown}
       >
         <div
           ref={timelineContainerRef}
