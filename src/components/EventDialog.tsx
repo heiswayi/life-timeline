@@ -34,6 +34,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
+import CascadingDateSelector from './CascadingDateSelector';
 
 const FormSchema = z.object({
   id: z.string().optional(),
@@ -53,11 +54,11 @@ interface EventDialogProps {
   onSave: (event: LifeEvent) => void;
 }
 
-const EventDialog: React.FC<EventDialogProps> = ({ 
-  open, 
-  onOpenChange, 
-  event, 
-  onSave 
+const EventDialog: React.FC<EventDialogProps> = ({
+  open,
+  onOpenChange,
+  event,
+  onSave
 }) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -132,78 +133,48 @@ const EventDialog: React.FC<EventDialogProps> = ({
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Date</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          initialFocus
-                          className="p-3 pointer-events-auto"
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="color"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Color</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center space-x-2">
-                        <Input
-                          type="color"
-                          {...field}
-                          className="w-12 h-9 p-1 cursor-pointer"
-                        />
-                        <Input
-                          type="text"
-                          value={field.value}
-                          onChange={field.onChange}
-                          className="w-full"
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Event Date</FormLabel>
+                  <CascadingDateSelector value={field.value} onChange={field.onChange} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="color"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Event Line Color</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        type="color"
+                        {...field}
+                        className="p-1 cursor-pointer"
+                      />
+                      <Input
+                        type="text"
+                        value={field.value}
+                        onChange={field.onChange}
+                        className="w-full"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="significance"
               render={({ field: { value, onChange } }) => (
                 <FormItem>
-                  <FormLabel>Significance ({value}%)</FormLabel>
+                  <FormLabel>Event Significance ({value}%)</FormLabel>
                   <FormControl>
                     <Slider
                       min={1}
@@ -226,7 +197,7 @@ const EventDialog: React.FC<EventDialogProps> = ({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description (Optional)</FormLabel>
+                  <FormLabel>Event Description (Optional)</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Add details about this life event..."
