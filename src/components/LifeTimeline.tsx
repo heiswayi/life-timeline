@@ -182,6 +182,7 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
   // Delete confirmation dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
+  const [clearAllDialogOpen, setClearAllDialogOpen] = useState(false);
 
   // Toast notifications
   const { toast } = useToast();
@@ -376,6 +377,28 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
     window.addEventListener('mouseup', handleMouseUp);
   };
 
+  const handleClearAllData = () => {
+    setEvents([]);
+    setConfig({
+      startYear: new Date().getFullYear(),
+      endYear: new Date().getFullYear(),
+      yearSpacing: 50,
+      showFutureYears: true,
+      highlightCurrentYear: true,
+    });
+
+    localStorage.removeItem('lifeEvents');
+    localStorage.removeItem('timelineConfig');
+
+    setClearAllDialogOpen(false);
+
+    toast({
+      title: "All Data Cleared",
+      description: "Your timeline has been reset.",
+      variant: "destructive",
+    });
+  };
+
   return (
     <div className={cn("flex flex-col h-full", className)}>
       <TimelineControls
@@ -383,6 +406,7 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
         onConfigChange={handleConfigChange}
         onAddEvent={handleAddEvent}
         onExportImage={handleExportImage}
+        onReset={() => setClearAllDialogOpen(true)}
         yearRange={yearRange}
       />
 
@@ -517,6 +541,27 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Clear All Confirmation Dialog */}
+      <AlertDialog open={clearAllDialogOpen} onOpenChange={setClearAllDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear All Data?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will delete all events and reset your timeline settings. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleClearAllData}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Clear All
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
