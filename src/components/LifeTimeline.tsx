@@ -304,10 +304,41 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
         useCORS: true,
       });
 
-      // Convert canvas to data URL and create download link
-      const imageUrl = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.download = `life-timeline-${format(new Date(), 'yyyy-MM-dd')}.png`;
+      // Create a new canvas to overlay the watermark
+      const finalCanvas = document.createElement("canvas");
+      finalCanvas.width = canvas.width;
+      finalCanvas.height = canvas.height;
+
+      const ctx = finalCanvas.getContext("2d");
+      if (!ctx) throw new Error("Canvas context not available");
+
+      // Draw the captured image onto the new canvas
+      ctx.drawImage(canvas, 0, 0);
+
+      // Add watermark text at the bottom right corner
+      const watermarkText = "Made by Life Timeline";
+      ctx.font = "20px sans-serif"; // Adjust font size
+      ctx.fillStyle = "#1e293b"; // Semi-transparent white
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.1)"; // Outline for better visibility
+      ctx.lineWidth = 3;
+      ctx.textAlign = "right";
+      ctx.textBaseline = "bottom";
+
+      // Positioning the watermark
+      const padding = 30; // Distance from edges
+      const x = finalCanvas.width - padding;
+      const y = finalCanvas.height - padding;
+
+      // Draw stroke first (outline effect) and then fill
+      ctx.strokeText(watermarkText, x, y);
+      ctx.fillText(watermarkText, x, y);
+
+      // Convert final canvas to data URL
+      const imageUrl = finalCanvas.toDataURL("image/png");
+
+      // Create download link
+      const link = document.createElement("a");
+      link.download = `life-timeline-${format(new Date(), "yyyy-MM-dd")}.png`;
       link.href = imageUrl;
       link.click();
 
@@ -316,7 +347,7 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
         description: "Your timeline has been saved as a PNG image.",
       });
     } catch (error) {
-      console.error('Error exporting timeline:', error);
+      console.error("Error exporting timeline:", error);
       toast({
         title: "Export failed",
         description: "There was an error creating your image. Please try again.",
