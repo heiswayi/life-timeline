@@ -140,14 +140,29 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
     { earliestYear: new Date().getFullYear(), latestYear: new Date().getFullYear() }
   );
 
-  // Timeline configuration
-  const [config, setConfig] = useState<TimelineConfig>({
-    startYear: yearRange.earliestYear,
-    endYear: Math.max(yearRange.latestYear, new Date().getFullYear()),
-    yearSpacing: 100, // pixels per year
-    showFutureYears: true,
-    highlightCurrentYear: true,
+  // Load timeline configuration from localStorage or set defaults
+  const [config, setConfig] = useState<TimelineConfig>(() => {
+    const savedConfig = localStorage.getItem('timelineConfig');
+    if (savedConfig) {
+      try {
+        return JSON.parse(savedConfig);
+      } catch (error) {
+        console.error('Failed to parse saved config', error);
+      }
+    }
+    return {
+      startYear: yearRange.earliestYear,
+      endYear: Math.max(yearRange.latestYear, new Date().getFullYear()),
+      yearSpacing: 50,
+      showFutureYears: true,
+      highlightCurrentYear: true,
+    };
   });
+
+  // Save config to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('timelineConfig', JSON.stringify(config));
+  }, [config]);
 
   // Update config if year range changes significantly
   useEffect(() => {
