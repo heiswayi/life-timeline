@@ -15,20 +15,28 @@ interface EventTickerProps {
   className?: string;
 }
 
-const EventTicker: React.FC<EventTickerProps> = ({ 
-  event, 
+const EventTicker: React.FC<EventTickerProps> = ({
+  event,
   onEdit,
   onDelete,
   isHighlighted,
   onHoverStart,
   onHoverEnd,
-  className 
+  className
 }) => {
   // Calculate height based on significance (1-100)
   const height = Math.max(30, Math.min(150, 30 + event.significance));
-  
+
+  // const formatDate = (dateString: string): string => {
+  //   const date = new Date(dateString);
+  //   return date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
+  // };
+  const formatDate = (date: Date): string => {
+    return date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
+  };
+
   return (
-    <div 
+    <div
       className={cn(
         "group flex flex-col items-center animate-fade-in",
         isHighlighted && "z-10",
@@ -40,24 +48,24 @@ const EventTicker: React.FC<EventTickerProps> = ({
       <ContextMenu>
         <ContextMenuTrigger asChild>
           <div className="flex flex-col items-center cursor-pointer">
-            <div 
+            <div
               className={cn(
-                "ticker-line w-1 z-0", 
+                "ticker-line w-1 z-0",
                 isHighlighted && "opacity-100",
                 !isHighlighted && "opacity-80"
               )}
-              style={{ 
-                height: `${height}px`, 
-                backgroundColor: event.color || 'hsl(var(--primary))' 
+              style={{
+                height: `${height}px`,
+                backgroundColor: event.color || 'hsl(var(--primary))'
               }}
             />
             {/* Title displayed diagonally at the bottom, position improved */}
-            <span 
+            <span
               className={cn(
                 "text-xs max-w-[100px] origin-top-left",
                 isHighlighted ? "" : ""
               )}
-              style={{ 
+              style={{
                 transform: 'rotate(-45deg)',
                 transformOrigin: 'left top',
                 display: 'block',
@@ -74,18 +82,18 @@ const EventTicker: React.FC<EventTickerProps> = ({
                 hyphens: 'auto',
               }}
             >
-              {event.title}
+              {formatDate(event.date)}<br />{event.title}
             </span>
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent className="w-48">
-          <ContextMenuItem 
+          <ContextMenuItem
             onClick={() => onEdit(event)}
             className="flex items-center gap-2 cursor-pointer"
           >
             <Pencil className="h-4 w-4" /> Edit Event
           </ContextMenuItem>
-          <ContextMenuItem 
+          <ContextMenuItem
             onClick={() => onDelete(event.id)}
             className="flex items-center gap-2 cursor-pointer text-destructive"
           >
