@@ -39,11 +39,11 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
         console.error('Failed to parse saved events', error);
       }
     }
-    
+
     // Default sample events if nothing in localStorage
     const today = new Date();
     const currentYear = today.getFullYear();
-    
+
     return [
       {
         id: '1',
@@ -139,7 +139,7 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
     },
     { earliestYear: new Date().getFullYear(), latestYear: new Date().getFullYear() }
   );
-  
+
   // Timeline configuration
   const [config, setConfig] = useState<TimelineConfig>({
     startYear: yearRange.earliestYear,
@@ -148,7 +148,7 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
     showFutureYears: true,
     highlightCurrentYear: true,
   });
-  
+
   // Update config if year range changes significantly
   useEffect(() => {
     if (yearRange.earliestYear < config.startYear || yearRange.latestYear > config.endYear) {
@@ -159,43 +159,43 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
       }));
     }
   }, [yearRange, config.startYear, config.endYear]);
-  
+
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<Partial<LifeEvent> | null>(null);
-  
+
   // Delete confirmation dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<string | null>(null);
-  
+
   // Toast notifications
   const { toast } = useToast();
-  
+
   // Reference to the timeline for scrolling and image export
   const timelineRef = useRef<HTMLDivElement>(null);
   const timelineContainerRef = useRef<HTMLDivElement>(null);
-  
+
   // Save events to localStorage when they change
   useEffect(() => {
     localStorage.setItem('lifeEvents', JSON.stringify(events));
   }, [events]);
-  
+
   // Handle adding a new event
   const handleAddEvent = () => {
     setCurrentEvent(null);
     setDialogOpen(true);
   };
-  
+
   // Handle editing an existing event
   const handleEditEvent = (event: LifeEvent) => {
     setCurrentEvent(event);
     setDialogOpen(true);
   };
-  
+
   // Handle saving an event (add or edit)
   const handleSaveEvent = (event: LifeEvent) => {
     const isNew = !events.some(e => e.id === event.id);
-    
+
     if (isNew) {
       setEvents([...events, event].sort((a, b) => a.date.getTime() - b.date.getTime()));
       toast({
@@ -211,20 +211,20 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
       });
     }
   };
-  
+
   // Handle deleting an event
   const handleRequestDelete = (eventId: string) => {
     setEventToDelete(eventId);
     setDeleteDialogOpen(true);
   };
-  
+
   const handleConfirmDelete = () => {
     if (eventToDelete) {
       const eventTitle = events.find(e => e.id === eventToDelete)?.title;
       setEvents(events.filter(e => e.id !== eventToDelete));
       setDeleteDialogOpen(false);
       setEventToDelete(null);
-      
+
       toast({
         title: "Event Deleted",
         description: `"${eventTitle}" has been removed from your timeline.`,
@@ -232,54 +232,54 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
       });
     }
   };
-  
+
   // Handle timeline configuration changes
   const handleConfigChange = (newConfig: Partial<TimelineConfig>) => {
     setConfig({ ...config, ...newConfig });
   };
-  
+
   // Generate years array based on configuration
   const years = Array.from(
     { length: config.endYear - config.startYear + 1 },
     (_, i) => config.startYear + i
   );
-  
+
   // Calculate current year
   const currentYear = new Date().getFullYear();
-  
+
   // Calculate total timeline width based on year spacing
-  const timelineWidth = years.length * config.yearSpacing;
-  
+  const timelineWidth = (years.length * config.yearSpacing) + 100;
+
   // Sort events by date
   const sortedEvents = [...events].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
-  
-  // Center the timeline to current year on first render
-  useEffect(() => {
-    if (timelineRef.current && config.highlightCurrentYear) {
-      const currentYearIndex = years.indexOf(currentYear);
-      if (currentYearIndex !== -1) {
-        const scrollPosition = currentYearIndex * config.yearSpacing - window.innerWidth / 2 + config.yearSpacing / 2;
-        timelineRef.current.scrollLeft = Math.max(0, scrollPosition);
-      }
-    }
-  }, [config.highlightCurrentYear, config.yearSpacing, currentYear, years]);
-  
+
+  // // Center the timeline to current year on first render
+  // useEffect(() => {
+  //   if (timelineRef.current && config.highlightCurrentYear) {
+  //     const currentYearIndex = years.indexOf(currentYear);
+  //     if (currentYearIndex !== -1) {
+  //       const scrollPosition = currentYearIndex * config.yearSpacing - window.innerWidth / 2 + config.yearSpacing / 2;
+  //       timelineRef.current.scrollLeft = Math.max(0, scrollPosition);
+  //     }
+  //   }
+  // }, [config.highlightCurrentYear, config.yearSpacing, currentYear, years]);
+
   // Add state for hover highlighting
   const [hoveredEventId, setHoveredEventId] = useState<string | null>(null);
-  
+
   // Handle exporting timeline as image
   const handleExportImage = async () => {
     if (!timelineContainerRef.current) return;
-    
+
     try {
       // Show toast to indicate export is in progress
       toast({
         title: "Preparing image...",
         description: "Please wait while we generate your timeline image.",
       });
-      
+
       // Use html2canvas to capture the timeline
       const canvas = await html2canvas(timelineContainerRef.current, {
         backgroundColor: null,
@@ -288,14 +288,14 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
         allowTaint: true,
         useCORS: true,
       });
-      
+
       // Convert canvas to data URL and create download link
       const imageUrl = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.download = `life-timeline-${format(new Date(), 'yyyy-MM-dd')}.png`;
       link.href = imageUrl;
       link.click();
-      
+
       toast({
         title: "Export successful!",
         description: "Your timeline has been saved as a PNG image.",
@@ -312,24 +312,24 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (!timelineRef.current) return;
-    
+
     const startX = event.clientX;
     const startScrollLeft = timelineRef.current.scrollLeft;
-  
+
     const handleMouseMove = (moveEvent: MouseEvent) => {
       const deltaX = moveEvent.clientX - startX;
       timelineRef.current!.scrollLeft = startScrollLeft - deltaX;
     };
-  
+
     const handleMouseUp = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  
+
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
   };
-  
+
   return (
     <div className={cn("flex flex-col h-full", className)}>
       <TimelineControls
@@ -339,7 +339,7 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
         onExportImage={handleExportImage}
         yearRange={yearRange}
       />
-      
+
       <div
         ref={timelineRef}
         className="overflow-x-auto overscroll-x-contain timeline-scrollbar bg-gradient-to-b from-background/40 to-background"
@@ -349,7 +349,7 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
         <div
           ref={timelineContainerRef}
           className="relative bg-[#010614] border"
-          style={{ 
+          style={{
             width: `${timelineWidth}px`,
             minWidth: '100%',
             height: '300px',
@@ -357,14 +357,14 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
         >
           {/* Main timeline line - positioned exactly in the middle */}
           <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-timeline-line transform -translate-y-1/2" />
-          
+
           {/* Year markers - properly aligned to vertical center */}
           {years.map((year, index) => (
             <div
               key={year}
               className="absolute top-1/2 transform -translate-y-1/4 transition-opacity duration-500"
-              style={{ 
-                left: `${index * config.yearSpacing}px`,
+              style={{
+                left: `${index * config.yearSpacing + 20}px`,
                 opacity: (!config.showFutureYears && year > currentYear) ? 0.3 : 1
               }}
             >
@@ -374,27 +374,29 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
               />
             </div>
           ))}
-          
+
           {/* Event tickers - properly aligned to vertical center */}
           {sortedEvents.map((event) => {
             const eventYear = new Date(event.date).getFullYear();
             const eventMonth = new Date(event.date).getMonth();
-            const monthOffset = (eventMonth / 12) * config.yearSpacing;
-            
+            const yearSpacing = config.yearSpacing + 1;
+            const tickerPosition = eventMonth / 12 * yearSpacing;
+            const monthOffset = 32 + tickerPosition;
+
             // Skip if the event year is outside our range
             if (eventYear < config.startYear || eventYear > config.endYear) {
               return null;
             }
-            
+
             const yearIndex = years.indexOf(eventYear);
             const isHovered = hoveredEventId === event.id;
-            
+
             return (
               <div
                 key={event.id}
                 className="absolute top-1/2 transform -translate-y-1/2"
-                style={{ 
-                  left: `${(yearIndex * config.yearSpacing) + monthOffset}px` 
+                style={{
+                  left: `${(yearIndex * config.yearSpacing) + monthOffset}px`
                 }}
               >
                 <EventTicker
@@ -411,13 +413,13 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
         </div>
       </div>
       <span className='text-sm opacity-50 italic'><strong>Tip:</strong> Right-click on the event line to edit or delete it.</span>
-      
+
       {/* Event descriptions section - reduced top margin */}
       <div className="mt-8 pb-8">
         <h3 className="text-lg font-medium mb-3 text-foreground">Life Events</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {sortedEvents.map(event => (
-            <div 
+            <div
               key={event.id}
               className={cn(
                 "bg-card p-4 rounded-lg border border-border/50 transition-all duration-300",
@@ -426,9 +428,9 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
               onMouseEnter={() => setHoveredEventId(event.id)}
               onMouseLeave={() => setHoveredEventId(null)}
             >
-              <div 
-                className="h-1 w-full mb-3 rounded-full" 
-                style={{ backgroundColor: event.color || 'hsl(var(--primary))' }} 
+              <div
+                className="h-1 w-full mb-3 rounded-full"
+                style={{ backgroundColor: event.color || 'hsl(var(--primary))' }}
               />
               <h4 className="font-medium text-sm">{event.title}</h4>
               <p className="text-xs text-muted-foreground mt-1">
@@ -444,7 +446,7 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
           ))}
         </div>
       </div>
-      
+
       {/* Event Dialog */}
       <EventDialog
         open={dialogOpen}
@@ -452,7 +454,7 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
         event={currentEvent}
         onSave={handleSaveEvent}
       />
-      
+
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
@@ -464,7 +466,7 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
+            <AlertDialogAction
               onClick={handleConfirmDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
@@ -473,7 +475,7 @@ const LifeTimeline: React.FC<LifeTimelineProps> = ({ className }) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </div >
   );
 };
 
