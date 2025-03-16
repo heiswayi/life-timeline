@@ -121,3 +121,9 @@
     transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
+
+.timeline-bg {
+  background-color: #010614;
+  background-image:  linear-gradient(#000410 1px, transparent 1px), linear-gradient(to right, #000410 1px, #010614 1px);
+  background-size: 10px 10px;
+}

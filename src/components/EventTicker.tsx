@@ -1,9 +1,14 @@
-
-import React from 'react';
-import { cn } from '@/lib/utils';
-import { LifeEvent } from '@/types';
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu';
-import { Pencil, Trash2 } from 'lucide-react';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+import { cn } from "@/lib/utils";
+import { LifeEvent } from "@/types";
+import { format } from "date-fns";
+import { Pencil, Trash2 } from "lucide-react";
+import React from "react";
 
 interface EventTickerProps {
   event: LifeEvent;
@@ -22,18 +27,10 @@ const EventTicker: React.FC<EventTickerProps> = ({
   isHighlighted,
   onHoverStart,
   onHoverEnd,
-  className
+  className,
 }) => {
   // Calculate height based on significance (1-100)
   const height = Math.max(30, Math.min(150, 30 + event.significance));
-
-  // const formatDate = (dateString: string): string => {
-  //   const date = new Date(dateString);
-  //   return date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
-  // };
-  const formatDate = (date: Date): string => {
-    return date.toLocaleDateString('en-US', { month: 'short', day: '2-digit' });
-  };
 
   return (
     <div
@@ -56,7 +53,7 @@ const EventTicker: React.FC<EventTickerProps> = ({
               )}
               style={{
                 height: `${height}px`,
-                backgroundColor: event.color || 'hsl(var(--primary))'
+                backgroundColor: event.color || "hsl(var(--primary))",
               }}
             />
             {/* Title displayed diagonally at the bottom, position improved */}
@@ -66,23 +63,25 @@ const EventTicker: React.FC<EventTickerProps> = ({
                 isHighlighted ? "" : ""
               )}
               style={{
-                transform: 'rotate(-45deg)',
-                transformOrigin: 'left top',
-                display: 'block',
-                position: 'absolute',
-                top: '-10px',
-                left: '-5px',
-                color: event.color || 'hsl(var(--foreground))',
-                fontSize: '10px',
-                lineHeight: '1.1',
-                wordBreak: 'break-word',
-                whiteSpace: 'pre-wrap',
-                width: '100px',
-                overflowWrap: 'break-word',
-                hyphens: 'auto',
+                transform: "rotate(-45deg)",
+                transformOrigin: "left top",
+                display: "block",
+                position: "absolute",
+                top: "-10px",
+                left: "-5px",
+                color: event.color || "hsl(var(--foreground))",
+                fontSize: "10px",
+                lineHeight: "1.1",
+                wordBreak: "break-word",
+                whiteSpace: "pre-wrap",
+                width: "100px",
+                overflowWrap: "break-word",
+                hyphens: "auto",
               }}
             >
-              {formatDate(event.date)}<br />{event.title}
+              {format(new Date(event.date), "MMM dd")}
+              <br />
+              {event.title}
             </span>
           </div>
         </ContextMenuTrigger>

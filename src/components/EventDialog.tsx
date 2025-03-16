@@ -1,12 +1,4 @@
-
-import React, { useEffect } from 'react';
-import { format } from 'date-fns';
-import { LifeEvent } from '@/types';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { CalendarIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -14,34 +6,32 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Slider } from '@/components/ui/slider';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import CascadingDateSelector from './CascadingDateSelector';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
+import { Textarea } from "@/components/ui/textarea";
+import { LifeEvent } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import CascadingDateSelector from "./CascadingDateSelector";
+import ColorSelect from "./ColorSelect";
 
 const FormSchema = z.object({
   id: z.string().optional(),
-  title: z.string().min(1, 'Title is required'),
+  title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   date: z.date({
-    required_error: 'Date is required',
+    required_error: "Date is required",
   }),
   significance: z.number().min(1).max(100),
   color: z.string().optional(),
@@ -58,38 +48,38 @@ const EventDialog: React.FC<EventDialogProps> = ({
   open,
   onOpenChange,
   event,
-  onSave
+  onSave,
 }) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      id: '',
-      title: '',
-      description: '',
+      id: "",
+      title: "",
+      description: "",
       date: new Date(),
       significance: 50,
-      color: '#0284c7',
+      color: "#0284c7",
     },
   });
 
   useEffect(() => {
     if (event) {
       form.reset({
-        id: event.id || '',
-        title: event.title || '',
-        description: event.description || '',
+        id: event.id || "",
+        title: event.title || "",
+        description: event.description || "",
         date: event.date || new Date(),
         significance: event.significance || 50,
-        color: event.color || '#0284c7',
+        color: event.color || "#0284c7",
       });
     } else {
       form.reset({
-        id: '',
-        title: '',
-        description: '',
+        id: "",
+        title: "",
+        description: "",
         date: new Date(),
         significance: 50,
-        color: '#0284c7',
+        color: "#0284c7",
       });
     }
   }, [event, form]);
@@ -98,7 +88,7 @@ const EventDialog: React.FC<EventDialogProps> = ({
     onSave({
       id: data.id || crypto.randomUUID(),
       title: data.title,
-      description: data.description || '',
+      description: data.description || "",
       date: data.date,
       significance: data.significance,
       color: data.color,
@@ -109,23 +99,29 @@ const EventDialog: React.FC<EventDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">
-        <div className="h-1.5 w-full" style={{ backgroundColor: form.watch('color') }} />
+        <div
+          className="h-1.5 w-full"
+          style={{ backgroundColor: form.watch("color") }}
+        />
         <DialogHeader className="p-6 pb-0">
           <DialogTitle className="text-xl font-medium">
-            {event?.id ? 'Edit Life Event' : 'Add Life Event'}
+            {event?.id ? "Edit Life Event" : "Add Life Event"}
           </DialogTitle>
           <DialogDescription>
             Capture your significant life moments to visualize on your timeline.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-6 py-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 px-6 py-4"
+          >
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Event Title</FormLabel>
+                  <FormLabel>Event title</FormLabel>
                   <FormControl>
                     <Input placeholder="Graduation, New Job, etc." {...field} />
                   </FormControl>
@@ -138,8 +134,11 @@ const EventDialog: React.FC<EventDialogProps> = ({
               name="date"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Event Date</FormLabel>
-                  <CascadingDateSelector value={field.value} onChange={field.onChange} />
+                  <FormLabel>Event date</FormLabel>
+                  <CascadingDateSelector
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
                   <FormMessage />
                 </FormItem>
               )}
@@ -149,12 +148,14 @@ const EventDialog: React.FC<EventDialogProps> = ({
               name="color"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Event Line Color</FormLabel>
+                  <FormLabel>Event color</FormLabel>
                   <FormControl>
                     <div className="flex items-center space-x-2">
+                      {/* Color Picker Input */}
                       <Input
                         type="color"
-                        {...field}
+                        value={field.value}
+                        onChange={(e) => field.onChange(e.target.value)}
                         className="p-1 cursor-pointer"
                       />
                       <Input
@@ -162,6 +163,11 @@ const EventDialog: React.FC<EventDialogProps> = ({
                         value={field.value}
                         onChange={field.onChange}
                         className="w-full"
+                      />
+
+                      {/* ColorSelect Dropdown */}
+                      <ColorSelect
+                        onSelect={(selected) => field.onChange(selected.value)}
                       />
                     </div>
                   </FormControl>
@@ -174,20 +180,23 @@ const EventDialog: React.FC<EventDialogProps> = ({
               name="significance"
               render={({ field: { value, onChange } }) => (
                 <FormItem>
-                  <FormLabel>Event Significance ({value}%)</FormLabel>
-                  <FormControl>
-                    <Slider
-                      min={1}
-                      max={100}
-                      step={1}
-                      defaultValue={[value]}
-                      onValueChange={(vals) => onChange(vals[0])}
-                      className="py-4"
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    How significant is this event in your life?
-                  </FormDescription>
+                  <FormLabel>
+                    How significant is this event in your life? ({value}%)
+                  </FormLabel>
+                  <div className="flex items-center space-x-2">
+                    <span>0</span>
+                    <FormControl>
+                      <Slider
+                        min={1}
+                        max={100}
+                        step={1}
+                        defaultValue={[value]}
+                        onValueChange={(vals) => onChange(vals[0])}
+                        className="py-4"
+                      />
+                    </FormControl>
+                    <span>100</span>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -197,7 +206,7 @@ const EventDialog: React.FC<EventDialogProps> = ({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Event Description (Optional)</FormLabel>
+                  <FormLabel>Event description (Optional)</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Add details about this life event..."

@@ -1,22 +1,21 @@
-
-import React from 'react';
-import { TimelineConfig } from '@/types';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Plus, Settings, Download, RefreshCcw } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip';
+} from "@/components/ui/tooltip";
+import { TimelineConfig } from "@/types";
+import { Download, Plus, RefreshCcw, Settings } from "lucide-react";
+import React from "react";
 
 interface TimelineControlsProps {
   config: TimelineConfig;
@@ -36,7 +35,7 @@ const TimelineControls: React.FC<TimelineControlsProps> = ({
   yearRange,
 }) => {
   return (
-    <div className="flex items-center justify-between py-4 bg-opacity-70 backdrop-blur-sm sticky top-0 z-10">
+    <div className="flex items-center justify-between py-4 bg-opacity-70 backdrop-blur-sm flex-wrap">
       <div className="flex items-center space-x-2">
         <TooltipProvider>
           <Tooltip>
@@ -49,9 +48,7 @@ const TimelineControls: React.FC<TimelineControlsProps> = ({
                 <Plus className="h-4 w-4 mr-1" /> Add Life Event
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="bottom">
-              Add a new life event
-            </TooltipContent>
+            <TooltipContent side="bottom">Add a new life event</TooltipContent>
           </Tooltip>
         </TooltipProvider>
 
@@ -60,11 +57,10 @@ const TimelineControls: React.FC<TimelineControlsProps> = ({
             <TooltipTrigger asChild>
               <Button
                 onClick={onExportImage}
-                variant="outline"
                 className="transition-all duration-300 shadow-sm"
                 size="sm"
               >
-                <Download className="h-4 w-4 mr-1" /> Export as Image
+                <Download className="h-4 w-4 mr-1" /> Export as Image (PNG)
               </Button>
             </TooltipTrigger>
             <TooltipContent side="bottom">
@@ -82,7 +78,7 @@ const TimelineControls: React.FC<TimelineControlsProps> = ({
                 onClick={onReset}
                 variant="destructive"
                 className="transition-all duration-300 shadow-sm"
-                size='sm'
+                size="sm"
               >
                 <RefreshCcw className="h-4 w-4" /> Clear All Data
               </Button>
@@ -101,15 +97,13 @@ const TimelineControls: React.FC<TimelineControlsProps> = ({
                   <Button
                     variant="outline"
                     className="transition-all duration-300"
-                    size='sm'
+                    size="sm"
                   >
                     <Settings className="h-4 w-4" /> Settings
                   </Button>
                 </PopoverTrigger>
               </TooltipTrigger>
-              <TooltipContent side="bottom">
-                Timeline settings
-              </TooltipContent>
+              <TooltipContent side="bottom">Timeline settings</TooltipContent>
             </Tooltip>
           </TooltipProvider>
 
@@ -119,27 +113,37 @@ const TimelineControls: React.FC<TimelineControlsProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="startYear" className="text-xs">Start Year</Label>
+                  <Label htmlFor="startYear" className="text-xs">
+                    Start Year
+                  </Label>
                   <Input
                     id="startYear"
                     type="number"
                     value={config.startYear}
                     min={yearRange.earliestYear - 10}
                     onChange={(e) =>
-                      onConfigChange({ startYear: parseInt(e.target.value) || yearRange.earliestYear })
+                      onConfigChange({
+                        startYear:
+                          parseInt(e.target.value) || yearRange.earliestYear,
+                      })
                     }
                     className="h-8"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="endYear" className="text-xs">End Year</Label>
+                  <Label htmlFor="endYear" className="text-xs">
+                    End Year
+                  </Label>
                   <Input
                     id="endYear"
                     type="number"
                     value={config.endYear}
                     min={yearRange.earliestYear}
                     onChange={(e) =>
-                      onConfigChange({ endYear: parseInt(e.target.value) || yearRange.latestYear })
+                      onConfigChange({
+                        endYear:
+                          parseInt(e.target.value) || yearRange.latestYear,
+                      })
                     }
                     className="h-8"
                   />
@@ -147,7 +151,9 @@ const TimelineControls: React.FC<TimelineControlsProps> = ({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="yearSpacing" className="text-xs">Year Spacing (px)</Label>
+                <Label htmlFor="yearSpacing" className="text-xs">
+                  Year Spacing (px)
+                </Label>
                 <Input
                   id="yearSpacing"
                   type="number"
@@ -155,14 +161,19 @@ const TimelineControls: React.FC<TimelineControlsProps> = ({
                   min={50}
                   max={200}
                   onChange={(e) =>
-                    onConfigChange({ yearSpacing: parseInt(e.target.value) || 100 })
+                    onConfigChange({
+                      yearSpacing: parseInt(e.target.value) || 100,
+                    })
                   }
                   className="h-8"
                 />
               </div>
 
               <div className="flex items-center justify-between">
-                <Label htmlFor="showFutureYears" className="text-xs cursor-pointer">
+                <Label
+                  htmlFor="showFutureYears"
+                  className="text-xs cursor-pointer"
+                >
                   Show Future Years
                 </Label>
                 <Switch
@@ -175,7 +186,10 @@ const TimelineControls: React.FC<TimelineControlsProps> = ({
               </div>
 
               <div className="flex items-center justify-between">
-                <Label htmlFor="highlightCurrentYear" className="text-xs cursor-pointer">
+                <Label
+                  htmlFor="highlightCurrentYear"
+                  className="text-xs cursor-pointer"
+                >
                   Highlight Current Year
                 </Label>
                 <Switch
@@ -190,7 +204,6 @@ const TimelineControls: React.FC<TimelineControlsProps> = ({
           </PopoverContent>
         </Popover>
       </div>
-
     </div>
   );
 };
